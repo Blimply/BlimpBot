@@ -8,7 +8,6 @@ namespace BlimpBot.Interfaces
 {
     public interface IExchangeRateServices
     {
-        string GetExchangeRateString();
-        CurrencyResponse GetExchangeRates(string inCurrency, string outCurrencies);
+        string GetExchangeRateString(List<string> argumentsList);
     }
 }

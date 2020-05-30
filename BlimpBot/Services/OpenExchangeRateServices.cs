@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 using BlimpBot.Interfaces;
 using BlimpBot.Types.OpenExchangeRatesTypes;
 using Microsoft.AspNetCore.WebUtilities;
@@ -23,7 +22,7 @@ namespace BlimpBot.Services
             _openExchangeRateApiToken = _configuration["OpenExchangeRatesToken"];
         }
 
-        public string GetExchangeRateString()
+        public string GetExchangeRateString(List<string> argumentsList)
         {
             var response = GetExchangeRates();
             var rates = response.rates;
@@ -41,18 +40,8 @@ namespace BlimpBot.Services
             return outString;
         }
 
-        public double GetExchangeRate()
-        {
-            throw new NotImplementedException();
-        }
-
-        public double GetExchangeRate(string inCurrency, string outCurrency)
-        {
-            throw new NotImplementedException();
-        }
-
         //Free tier only offers USD, so we need to convert to AUD
-        public CurrencyResponse GetExchangeRates(string inCurrency = "USD", string outCurrencies = "AUD,CHF,EUR,GBP")
+        private CurrencyResponse GetExchangeRates(string inCurrency = "USD", string outCurrencies = "AUD,CHF,EUR,GBP")
         {
             var openExchangeRateUrl = "https://openexchangerates.org/api/latest.json";
             var query = new Dictionary<string, string>

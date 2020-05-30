@@ -7,6 +7,6 @@ namespace BlimpBot.Interfaces
 {
     public interface IWeatherServices
     {
-        string GetWeatherString();
+        string GetWeatherString(List<string> argumentsList);
     }
 }

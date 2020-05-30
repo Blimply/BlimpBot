@@ -1,4 +1,7 @@
-﻿using BlimpBot.Enums;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
+using BlimpBot.Enums;
 using BlimpBot.Interfaces;
 
 namespace BlimpBot.Services
@@ -19,17 +22,60 @@ namespace BlimpBot.Services
             return MessageType.Message;
         }
 
-        private string GetCommandResponse(string command)
+        public string GetResponse(string message)
         {
-            if (command.Contains("@") && !command.Contains("BlimpBot")) return string.Empty;
+            var isBlimpSpecific = false;
+            if (message.Contains("@"))
+            {
+                if (!message.ToLower().Contains("blimbpot"))
+                    return string.Empty; //message is for another bot
+                isBlimpSpecific = true;
+            }
 
-            if (command.StartsWith("/weather"))
-                return _weatherServices.GetWeatherString();
-            if (command.StartsWith("/exchangerates"))
-                return _exchangeRateServices.GetExchangeRateString();
-            if(command.Contains("@"))
-                return "Command Unknown"; //if the command is directed @BlimpBot
-            return string.Empty; //maybe they're using some other bot - should consider private messages...
+            var response = string.Empty;
+            switch (GetMessageType(message))
+            {
+                case MessageType.Command:
+                    var parsedCommand = ParseCommand(message);
+                    response = GetCommandResponse(parsedCommand.commandName,parsedCommand.arguments, isBlimpSpecific);
+                    break;
+                case MessageType.Message:
+                    response = GetMessageResponse(message);
+                    break;
+            }
+
+            //url encoding is done by query helper
+            return response;
+        }
+
+        //Takes format e.g. /commandname arg1 arg2 arg3
+        private (string commandName, List<string> arguments) ParseCommand(string message)
+        {
+            var splitMessage = message.Split(' ');
+
+            //Take everything before the @ and strip out the /
+            var command = splitMessage.First()
+                                      .Split('@')
+                                      .First()
+                                      .Substring(1);
+            
+            return (command,splitMessage.Skip(1).ToList());
+            
+        }
+
+        private string GetCommandResponse(string commandName, List<string> arguments, bool isBlimpSpecific)
+        {
+            switch (commandName)
+            {
+                case "weather":
+                    return _weatherServices.GetWeatherString(arguments);
+                case "exchangerates":
+                case "exrates":
+                case "rates":
+                    return _exchangeRateServices.GetExchangeRateString(arguments);
+                default:
+                    return isBlimpSpecific ? "Command unknown" : string.Empty;
+            }
         }
 
         private string GetMessageResponse(string message)
@@ -47,29 +93,5 @@ namespace BlimpBot.Services
             return string.Empty;
         }
 
-        public string GetResponse(string message)
-        {
-            var response = string.Empty;
-            switch (GetMessageType(message))
-            {
-                case MessageType.Command:
-                    response = GetCommandResponse(message);
-                    break;
-                case MessageType.Message:
-                    response = GetMessageResponse(message);
-                    break;
-            }
-
-            //url encoder is done by query helper
-            return response;
-        }
-
-        //Fixme - slow?
-        //private string EscapeMarkup(string message)
-        //{
-        //    var escapeChars = new List<string>{"_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"};
-        //    escapeChars.ToList().ForEach(i=> message = message.Replace(i,@"\"+i));
-        //    return message;
-        //}
     }
 }

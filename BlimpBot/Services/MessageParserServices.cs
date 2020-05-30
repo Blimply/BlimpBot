@@ -16,12 +16,6 @@ namespace BlimpBot.Services
             _weatherServices = weatherServices;
             _exchangeRateServices = exchangeRateServices;
         }
-        private MessageType GetMessageType(string message)
-        {
-            if (message.StartsWith("/")) return MessageType.Command;
-            return MessageType.Message;
-        }
-
         public string GetResponse(string message)
         {
             var isBlimpSpecific = false;
@@ -46,6 +40,11 @@ namespace BlimpBot.Services
 
             //url encoding is done by query helper
             return response;
+        }
+        private MessageType GetMessageType(string message)
+        {
+            if (message.StartsWith("/")) return MessageType.Command;
+            return MessageType.Message;
         }
 
         //Takes format e.g. /commandname arg1 arg2 arg3

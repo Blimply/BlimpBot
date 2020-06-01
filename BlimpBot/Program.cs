@@ -34,7 +34,7 @@ namespace BlimpBot
                 try
                 {
                     var context = services.GetRequiredService<BlimpBotContext>();
-                    context.Database.Migrate();
+                    DbInitialiser.Initialise(context);
                 }
                 catch (Exception ex)
                 {

@@ -22,7 +22,7 @@ namespace BlimpBot.Pages
 
         public async Task<IActionResult> OnGet()
         {
-            Chats = await _context.Chats.ToListAsync();
+            Chats = await _context.Chats.Where(i=>i.Name != "Seed data").ToListAsync();
             return Page();
         }
     }

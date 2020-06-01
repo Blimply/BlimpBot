@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BlimpBot.Data;
 using BlimpBot.Interfaces;
@@ -39,8 +40,10 @@ namespace BlimpBot
 
             // Can't put this an app-setting since the port is non-default and may change
             if (connectionString == null || string.IsNullOrWhiteSpace(connectionString))
-                Environment.GetEnvironmentVariable("MYSQLCONNSTR_localdb");                                                                                                
-
+            {
+                connectionString = Environment.GetEnvironmentVariable("MYSQLCONNSTR_localdb");
+                connectionString = NormaliseAzureMySQLInAppConnString(connectionString);
+            }
 
             services.AddDbContext<BlimpBotContext>(options => options.UseMySQL(connectionString));
 
@@ -71,6 +74,25 @@ namespace BlimpBot
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
             });
+        }
+
+        //based on SO answer https://stackoverflow.com/a/58020841 by itminus
+        private string NormaliseAzureMySQLInAppConnString(string connectionString)
+        {
+            connectionString += ";";
+            //MySQL string format by default looks like:
+            //Database=localdb;Data source=127.0.0.1:50356;User Id=azure;Password=randPassString
+
+            var database = new Regex(@"Database=(.*?);").Match(connectionString).Groups[1];
+            var userId = new Regex(@"User Id=(.*?);").Match(connectionString).Groups[1];
+            var password = new Regex(@"Password=(.*?);").Match(connectionString).Groups[1];
+
+            var dataSourceTmp = new Regex(@"Data source=(.*?):(.*?);").Match(connectionString).Groups;
+            var server = dataSourceTmp[1];
+            var port = dataSourceTmp[2];
+            //Convert to format
+            //Server=127.0.0.01;Port=50356;Database=localdb;Uid=Azure;Pwd=randPassString
+            return $"Server={server};Port={port};Database={database};Uid={userId};Pwd={password};";
         }
 
     }

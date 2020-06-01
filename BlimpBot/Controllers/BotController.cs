@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using BlimpBot.Interfaces;
-using BlimpBot.Types;
+using BlimpBot.Models.TelegramResponseModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;

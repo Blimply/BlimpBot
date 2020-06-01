@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using BlimpBot.Data;
 using BlimpBot.Interfaces;
 using BlimpBot.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,6 +29,9 @@ namespace BlimpBot
         {
             services.AddRazorPages();
             services.AddControllersWithViews();
+
+            services.AddDbContext<BlimpBotContext>(options =>
+                                                     options.UseMySQL(Configuration.GetConnectionString("BlimpBotContext")));
 
             services.AddSingleton<HttpClient>();
             services.AddSingleton<IWeatherServices, WeatherServices>();

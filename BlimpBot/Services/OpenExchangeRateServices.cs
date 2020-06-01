@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using BlimpBot.Interfaces;
-using BlimpBot.Types.OpenExchangeRatesTypes;
+using BlimpBot.Models.ExchangeRateModels;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BlimpBot.Types.OpenExchangeRatesTypes;
 
 namespace BlimpBot.Interfaces
 {

@@ -2,6 +2,29 @@
 @using BlimpBot.Pages
 @model HomePageModel
 
+@{
+    ViewData["Title"] = "BlimpBot HomePage";
+}
 
-<h2>Hello and welcome to BlimpBot's homepage! Hope you have a nice day.</h2>
+<h1>Hello and welcome to BlimpBot's homepage! Hope you have a nice day.</h1>
+
+I am currently in @(Model.Chats.Count-1) chats. The names of these chats are:
+<table>
+    <tr>
+        <th>Chat Name</th>
+        <th>Last message received</th>
+    </tr>
+    @foreach (var chat in Model.Chats)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(i=>chat.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(i=>chat.LastMessageReceived)
+            </td>
+        </tr>
+    }
+</table>
+
 

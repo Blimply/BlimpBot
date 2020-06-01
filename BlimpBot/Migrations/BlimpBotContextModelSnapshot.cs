@@ -29,8 +29,8 @@ namespace BlimpBot.Migrations
                     b.Property<int>("MembersCount")
                         .HasColumnType("int");
 
-                    b.Property<int>("Name")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

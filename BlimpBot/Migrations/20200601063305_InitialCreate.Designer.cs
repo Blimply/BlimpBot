@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlimpBot.Migrations
 {
     [DbContext(typeof(BlimpBotContext))]
-    [Migration("20200601055731_InitialCreate")]
+    [Migration("20200601063305_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,8 +31,8 @@ namespace BlimpBot.Migrations
                     b.Property<int>("MembersCount")
                         .HasColumnType("int");
 
-                    b.Property<int>("Name")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

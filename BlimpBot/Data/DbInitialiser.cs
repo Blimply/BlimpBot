@@ -17,7 +17,7 @@ namespace BlimpBot.Data
                 return;
             var now = DateTime.Now; //sometimes databases get messy with DateTime calls
 
-            var chats = new Chat[]
+            var chats = new[]
             {
                 new Chat
                 {

@@ -14,7 +14,7 @@ namespace BlimpBot.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
                     MembersCount = table.Column<int>(nullable: false),
                     LastMessageReceived = table.Column<DateTime>(nullable: true)
                 },

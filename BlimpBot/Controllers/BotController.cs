@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using BlimpBot.Constants;
 using BlimpBot.Interfaces;
 using BlimpBot.Models.TelegramResponseModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 
 namespace BlimpBot.Controllers
@@ -41,10 +38,10 @@ namespace BlimpBot.Controllers
 
 
         [HttpPost("telegram/BlimpBot/{token}")]
-        public void HandleWebhook(string token,[FromBody]TelegramUpdate telegramUpdate)
+        public OkResult HandleWebhook(string token,[FromBody]TelegramUpdate telegramUpdate)
         {
-            if (token != _token) return;
-            
+            if (token != _token) return Ok();
+            if (telegramUpdate?.TelegramMesssage?.TelegramChat == null) return Ok();
 
             var chat = telegramUpdate.TelegramMesssage.TelegramChat;
             if (telegramUpdate.TelegramMesssage.TelegramChat.Type != ChatTypes.Private)
@@ -52,8 +49,10 @@ namespace BlimpBot.Controllers
 
             var response = _messageParser.GetResponse(telegramUpdate.TelegramMesssage.Text);
 
-            if (string.IsNullOrWhiteSpace(response)) return;
+            if (string.IsNullOrWhiteSpace(response)) return Ok();
             _telegramServices.SendMessage(response, chat.Id);
+
+            return Ok();
 
         }
 

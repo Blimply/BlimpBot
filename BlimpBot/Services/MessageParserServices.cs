@@ -52,12 +52,11 @@ namespace BlimpBot.Services
             return response;
         }
 
-        //TODO: Rename the two chat types
         public void AddChatListing(TelegramChat telegramChat)
         {
             DateTime now = DateTime.Now;
 
-            Chat dbChat = _context.Chats.Find(telegramChat.Id);
+            Chat dbChat = _context.Chats.FirstOrDefault(i=>i.ChatId == telegramChat.Id);
             if (dbChat != null) return;
 
             int memberCount = _telegramServices.GetChatMemberCount(telegramChat.Id).Value;
@@ -71,6 +70,7 @@ namespace BlimpBot.Services
             };
 
             _context.Chats.Add(chatToAdd);
+            _context.SaveChanges();
         }
 
         private MessageType GetMessageType(string message)

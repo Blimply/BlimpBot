@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using BlimpBot.Constants;
 using BlimpBot.Interfaces;
 using BlimpBot.Models.TelegramResponseModels;
 using Microsoft.AspNetCore.Mvc;
@@ -12,21 +13,17 @@ namespace BlimpBot.Controllers
     [ApiController]
     public class BotController : ControllerBase
     {
-        private readonly HttpClient _client;
         private readonly string _token;
-        private readonly string _telegramBaseUri = "https://api.telegram.org/bot";
 
         private readonly IMessageParser _messageParser;
-        private readonly IConfiguration _configuration;
+        private readonly ITelegramServices _telegramServices;
 
-        public BotController(HttpClient httpClient, IMessageParser messageParser, IConfiguration configuration)
+        public BotController(IMessageParser messageParser, IConfiguration configuration, ITelegramServices telegramServices)
         {
             //Injected dependencies
             _messageParser = messageParser;
-            _client = httpClient;
-            _configuration = configuration;
-            
-            _token = _configuration["BlimpBotTelegramToken"];
+            _telegramServices = telegramServices;
+            _token = configuration["BlimpBotTelegramToken"];
         }
 
 
@@ -39,31 +36,26 @@ namespace BlimpBot.Controllers
         [HttpGet("BasicInfo")]
         public async Task<ActionResult<string>> GetBasicInfoAsync()
         {
-            var responseString = await _client.GetStringAsync(_telegramBaseUri + _token+"/getMe");
-            return responseString;
+            return await _telegramServices.GetBasicInfo();
         }
 
 
         [HttpPost("telegram/BlimpBot/{token}")]
-        public async void HandleWebhook(string token,[FromBody]Update update)
+        public void HandleWebhook(string token,[FromBody]TelegramUpdate telegramUpdate)
         {
             if (token != _token) return;
-            var response = _messageParser.GetResponse(update.message.text);
+            
+
+            var chat = telegramUpdate.TelegramMesssage.TelegramChat;
+            if (telegramUpdate.TelegramMesssage.TelegramChat.Type != ChatTypes.Private)
+                _messageParser.AddChatListing(chat);
+
+            var response = _messageParser.GetResponse(telegramUpdate.TelegramMesssage.Text);
+
             if (string.IsNullOrWhiteSpace(response)) return;
-            SendMessage(response, update.message.chat.id);
+            _telegramServices.SendMessage(response, chat.Id);
+
         }
 
-        private async void SendMessage(string message, int chatId)
-        {
-            var query = new Dictionary<string, string>
-            {
-                ["chat_id"] = chatId.ToString(),
-                ["text"] = message,
-                ["parse_mode"] = "HTML",
-            };
-            var request = QueryHelpers.AddQueryString($"{_telegramBaseUri}{_token}/sendMessage", query);
-            //Console.WriteLine(request);
-            var response = await _client.GetAsync(request);
-        }
     }
 }

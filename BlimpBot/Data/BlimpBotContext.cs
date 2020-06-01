@@ -1,4 +1,4 @@
-﻿using BlimpBot.Models.DatabaseModels;
+﻿using BlimpBot.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlimpBot.Data

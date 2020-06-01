@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BlimpBot.Models.DatabaseModels;
+using BlimpBot.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlimpBot.Data
@@ -21,6 +21,7 @@ namespace BlimpBot.Data
             {
                 new Chat
                 {
+                    ChatId = 0,
                     MembersCount = 0,
                     Name = "Seed data",
                     LastMessageReceived = now

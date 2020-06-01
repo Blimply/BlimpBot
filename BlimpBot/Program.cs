@@ -20,12 +20,12 @@ namespace BlimpBot
         {
             var host = CreateWebHostBuilder(args).Build();
 
-            CreateDbIfNotExists(host);
+            MigrateAndSeedDatabase(host);
 
             host.Run();
         }
 
-        private static void CreateDbIfNotExists(IHost host)
+        private static void MigrateAndSeedDatabase(IHost host)
         {
             using (var scope = host.Services.CreateScope())
             {

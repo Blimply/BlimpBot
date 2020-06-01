@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using BlimpBot.Data;
 using BlimpBot.Interfaces;
@@ -28,17 +29,27 @@ namespace BlimpBot
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
-            services.AddControllersWithViews();
 
-            services.AddDbContext<BlimpBotContext>(options =>
-                                                     options.UseMySQL(Configuration.GetConnectionString("BlimpBotContext")));
+            services.AddControllersWithViews()
+                    .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy =
+                                                                        JsonNamingPolicy.CamelCase);
+
+            //Default to a named conn string if it exists or use MySQL In App
+            var connectionString = Configuration.GetConnectionString("BlimpBotContext");
+
+            // Can't put this an app-setting since the port is non-default and may change
+            if (connectionString == null || string.IsNullOrWhiteSpace(connectionString))
+                Environment.GetEnvironmentVariable("MYSQLCONNSTR_localdb");                                                                                                
+
+
+            services.AddDbContext<BlimpBotContext>(options => options.UseMySQL(connectionString));
 
             services.AddSingleton<HttpClient>();
+
             services.AddSingleton<IWeatherServices, WeatherServices>();
             services.AddSingleton<IMessageParser, MessageParserServices>();
-
             services.AddSingleton<IExchangeRateServices, OpenExchangeRateServices>();
-            services.AddHttpClient<IExchangeRateServices, OpenExchangeRateServices>();
+            services.AddSingleton<ITelegramServices, TelegramServices>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

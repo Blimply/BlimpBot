@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using BlimpBot.Enums;
+using BlimpBot.Constants;
+using BlimpBot.Data;
+using BlimpBot.Data.Models;
 using BlimpBot.Interfaces;
+using BlimpBot.Models.TelegramResponseModels;
 
 namespace BlimpBot.Services
 {
@@ -10,11 +13,18 @@ namespace BlimpBot.Services
     {
         private readonly IWeatherServices _weatherServices;
         private readonly IExchangeRateServices _exchangeRateServices;
+        private readonly ITelegramServices _telegramServices;
+        private readonly BlimpBotContext _context;
 
-        public MessageParserServices(IWeatherServices weatherServices, IExchangeRateServices exchangeRateServices)
+        public MessageParserServices(IWeatherServices weatherServices,
+                                     IExchangeRateServices exchangeRateServices,
+                                     ITelegramServices telegramServices,
+                                     BlimpBotContext context)
         {
             _weatherServices = weatherServices;
             _exchangeRateServices = exchangeRateServices;
+            _telegramServices = telegramServices;
+            _context = context;
         }
         public string GetResponse(string message)
         {
@@ -41,6 +51,28 @@ namespace BlimpBot.Services
             //url encoding is done by query helper
             return response;
         }
+
+        //TODO: Rename the two chat types
+        public void AddChatListing(TelegramChat telegramChat)
+        {
+            DateTime now = DateTime.Now;
+
+            Chat dbChat = _context.Chats.Find(telegramChat.Id);
+            if (dbChat != null) return;
+
+            int memberCount = _telegramServices.GetChatMemberCount(telegramChat.Id).Result.Value;
+            
+            var chatToAdd = new Chat
+            {
+                ChatId = telegramChat.Id,
+                Name = telegramChat.Title,
+                MembersCount = memberCount,
+                LastMessageReceived = now,
+            };
+
+            _context.Chats.Add(chatToAdd);
+        }
+
         private MessageType GetMessageType(string message)
         {
             if (message.StartsWith("/")) return MessageType.Command;

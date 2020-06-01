@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Text.Json;
 using BlimpBot.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
@@ -46,8 +47,17 @@ namespace BlimpBot.Services
                 ["chat_id"] = chatId.ToString(),
             };
             var request = QueryHelpers.AddQueryString($"{_telegramBaseUri}{_token}/getChatMembersCount", query);
-            //Console.WriteLine(request);
-            return int.Parse(_client.GetStringAsync(request).Result);
+            var response = _client.GetStringAsync(request).Result;
+            var memberCount = JsonSerializer.Deserialize<ChatMemberCountResponse>(response);
+
+            return memberCount.Result;
+        }
+
+        //TODO: new class
+        private class ChatMemberCountResponse
+        {
+            public bool Ok { get; set; }
+            public int Result { get; set; }
         }
     }
 }

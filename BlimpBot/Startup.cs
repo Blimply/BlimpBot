@@ -35,16 +35,15 @@ namespace BlimpBot
                     .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy =
                                                                         JsonNamingPolicy.CamelCase);
 
-            //Default to a named conn string if it exists or use MySQL In App
-            var connectionString = Configuration.GetConnectionString("BlimpBotContext");
-
-            // Can't put this an app-setting since the port is non-default and may change
+            // Can't put this an app-setting since the port is non-default and may chang
+            var connectionString = Environment.GetEnvironmentVariable("MYSQLCONNSTR_localdb");
+            
             if (connectionString == null || string.IsNullOrWhiteSpace(connectionString))
-            {
-                connectionString = Environment.GetEnvironmentVariable("MYSQLCONNSTR_localdb");
+                connectionString = Configuration.GetConnectionString("BlimpBotContext");
+            else
                 connectionString = NormaliseAzureMySQLInAppConnString(connectionString);
-            }
 
+            System.Diagnostics.Trace.TraceError("Connection string is:"+connectionString);
             services.AddDbContext<BlimpBotContext>(options => options.UseMySQL(connectionString));
 
             services.AddSingleton<HttpClient>();
@@ -87,7 +86,7 @@ namespace BlimpBot
             var userId = new Regex(@"User Id=(.*?);").Match(connectionString).Groups[1];
             var password = new Regex(@"Password=(.*?);").Match(connectionString).Groups[1];
 
-            var dataSourceTmp = new Regex(@"Data source=(.*?):(.*?);").Match(connectionString).Groups;
+            var dataSourceTmp = new Regex(@"Data Source=(.*?):(.*?);").Match(connectionString).Groups;
             var server = dataSourceTmp[1];
             var port = dataSourceTmp[2];
             //Convert to format

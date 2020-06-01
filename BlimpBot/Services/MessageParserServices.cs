@@ -60,7 +60,7 @@ namespace BlimpBot.Services
             Chat dbChat = _context.Chats.Find(telegramChat.Id);
             if (dbChat != null) return;
 
-            int memberCount = _telegramServices.GetChatMemberCount(telegramChat.Id).Result.Value;
+            int memberCount = _telegramServices.GetChatMemberCount(telegramChat.Id).Value;
             
             var chatToAdd = new Chat
             {

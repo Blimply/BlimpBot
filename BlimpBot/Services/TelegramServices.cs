@@ -39,10 +39,15 @@ namespace BlimpBot.Services
             return await _client.GetStringAsync(request);
         }
 
-        public Task<ActionResult<int>> GetChatMemberCount(int chatId)
+        public ActionResult<int> GetChatMemberCount(int chatId)
         {
-            throw new NotImplementedException();
+            var query = new Dictionary<string, string>
+            {
+                ["chat_id"] = chatId.ToString(),
+            };
+            var request = QueryHelpers.AddQueryString($"{_telegramBaseUri}{_token}/getChatMembersCount", query);
+            //Console.WriteLine(request);
+            return int.Parse(_client.GetStringAsync(request).Result);
         }
-
     }
 }

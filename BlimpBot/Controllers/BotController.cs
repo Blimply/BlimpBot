@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using BlimpBot.Constants;
 using BlimpBot.Interfaces;
 using BlimpBot.Models.TelegramResponseModels;
@@ -40,17 +42,25 @@ namespace BlimpBot.Controllers
         [HttpPost("telegram/BlimpBot/{token}")]
         public OkResult HandleWebhook(string token,[FromBody]TelegramUpdate telegramUpdate)
         {
-            if (token != _token) return Ok();
-            if (telegramUpdate?.TelegramMesssage?.TelegramChat == null) return Ok();
+            try
+            {
+                if (token != _token) return Ok();
+                if (telegramUpdate?.TelegramMesssage?.TelegramChat == null) return Ok();
 
-            var chat = telegramUpdate.TelegramMesssage.TelegramChat;
-            if (telegramUpdate.TelegramMesssage.TelegramChat.Type != ChatTypes.Private)
-                _messageParser.AddChatListing(chat);
+                var chat = telegramUpdate.TelegramMesssage.TelegramChat;
+                //if (telegramUpdate.TelegramMesssage.TelegramChat.Type != ChatTypes.Private)
+                //    _messageParser.AddChatListing(chat);
 
-            var response = _messageParser.GetResponse(telegramUpdate.TelegramMesssage.Text);
+                var response = _messageParser.GetResponse(telegramUpdate.TelegramMesssage.Text);
 
-            if (string.IsNullOrWhiteSpace(response)) return Ok();
-            _telegramServices.SendMessage(response, chat.Id);
+                if (string.IsNullOrWhiteSpace(response)) return Ok();
+                _telegramServices.SendMessage(response, chat.Id);
+            }
+            catch(Exception ex)
+            {
+                Trace.TraceError(ex.ToString());
+                return Ok(); //stop telegram spamming our webhook if we fail
+            }
 
             return Ok();
 

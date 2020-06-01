@@ -29,12 +29,6 @@ namespace BlimpBot
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
-
-            services.AddControllersWithViews()
-                    .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy =
-                                                                        JsonNamingPolicy.CamelCase);
-
             // Can't put this an app-setting since the port is non-default and may chang
             var connectionString = Environment.GetEnvironmentVariable("MYSQLCONNSTR_localdb");
             
@@ -42,16 +36,20 @@ namespace BlimpBot
                 connectionString = Configuration.GetConnectionString("BlimpBotContext");
             else
                 connectionString = NormaliseAzureMySQLInAppConnString(connectionString);
-
-            System.Diagnostics.Trace.TraceError("Connection string is:"+connectionString);
+            
             services.AddDbContext<BlimpBotContext>(options => options.UseMySQL(connectionString));
-
             services.AddSingleton<HttpClient>();
+
+            services.AddControllersWithViews()
+                    .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy =
+                                        JsonNamingPolicy.CamelCase);
+            services.AddRazorPages();
 
             services.AddScoped<IWeatherServices, WeatherServices>();
             services.AddScoped<IMessageParser, MessageParserServices>();
             services.AddScoped<IExchangeRateServices, OpenExchangeRateServices>();
             services.AddScoped<ITelegramServices, TelegramServices>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

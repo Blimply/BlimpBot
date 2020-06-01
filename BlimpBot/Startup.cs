@@ -46,10 +46,10 @@ namespace BlimpBot
 
             services.AddSingleton<HttpClient>();
 
-            services.AddSingleton<IWeatherServices, WeatherServices>();
-            services.AddSingleton<IMessageParser, MessageParserServices>();
-            services.AddSingleton<IExchangeRateServices, OpenExchangeRateServices>();
-            services.AddSingleton<ITelegramServices, TelegramServices>();
+            services.AddScoped<IWeatherServices, WeatherServices>();
+            services.AddScoped<IMessageParser, MessageParserServices>();
+            services.AddScoped<IExchangeRateServices, OpenExchangeRateServices>();
+            services.AddScoped<ITelegramServices, TelegramServices>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

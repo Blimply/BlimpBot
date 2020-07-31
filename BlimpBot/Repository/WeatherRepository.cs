@@ -3,7 +3,7 @@ using BlimpBot.Interfaces;
 
 namespace BlimpBot
 {
-    public class WeatherServices : IWeatherServices
+    public class WeatherRepository : IWeatherRepository
     {
         public string GetWeatherString(List<string> argumentsList)
         {

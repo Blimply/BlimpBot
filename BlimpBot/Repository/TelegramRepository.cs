@@ -11,13 +11,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace BlimpBot.Services
 {
-    public class TelegramServices : ITelegramServices
+    public class TelegramRepository : ITelegramRepository
     {
         private readonly string _token;
         private readonly HttpClient _client;
         private readonly string _telegramBaseUri = "https://api.telegram.org/bot";
 
-        public TelegramServices(HttpClient client, IConfiguration configuration)
+        public TelegramRepository(HttpClient client, IConfiguration configuration)
         {
             _client = client;
             _token = configuration["BlimpBotTelegramToken"];

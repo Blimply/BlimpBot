@@ -6,6 +6,6 @@ namespace BlimpBot.Interfaces
     public interface IMessageParser
     {
         string GetResponse(string message);
-        void AddChatListing(TelegramChat telegramChat);
+        void AddUpdateChatListing(TelegramChat telegramChat); //These should be moved into a services somewhere
     }
 }

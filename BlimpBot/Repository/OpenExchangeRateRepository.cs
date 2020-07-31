@@ -10,12 +10,12 @@ using Newtonsoft.Json;
 
 namespace BlimpBot.Services
 {
-    public class OpenExchangeRateServices : IExchangeRateServices
+    public class OpenExchangeRateRepository : IExchangeRateRepository
     {
         private readonly HttpClient _client;
         private readonly string _openExchangeRateApiToken;
         private readonly IConfiguration _configuration;
-        public OpenExchangeRateServices(HttpClient client, IConfiguration configuration)
+        public OpenExchangeRateRepository(HttpClient client, IConfiguration configuration)
         {
             _client = client;
             _configuration = configuration;

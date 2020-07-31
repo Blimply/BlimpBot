@@ -12,7 +12,7 @@ I am currently in @(Model.Chats.Count) chats. The names of these chats are:
 <table>
     <tr>
         <th>Chat Name</th>
-        <th>Last message received</th>
+        <th>Last message received (AWST)</th>
     </tr>
     @foreach (var chat in Model.Chats)
     {
@@ -21,7 +21,10 @@ I am currently in @(Model.Chats.Count) chats. The names of these chats are:
                 @Html.DisplayFor(i=>chat.Name)
             </td>
             <td>
-                @Html.DisplayFor(i=>chat.LastMessageReceived)
+                @TimeZoneInfo.ConvertTimeFromUtc(chat.LastMessageReceived
+                                                               .Value
+                                                               .ToUniversalTime(),
+                                                           TimeZoneInfo.FindSystemTimeZoneById("W. Australia Standard Time")).ToString("yyyy-MMM-dd hh:mm:ss tt")
             </td>
         </tr>
     }

@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace BlimpBot.Interfaces
 {
-    public interface IExchangeRateServices
+    public interface IBaseRepository
     {
-        string GetExchangeRateString(List<string> argumentsList);
+        void SaveChanges();
     }
 }

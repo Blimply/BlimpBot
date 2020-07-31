@@ -15,13 +15,13 @@ namespace BlimpBot.Controllers
         private readonly string _token;
 
         private readonly IMessageParser _messageParser;
-        private readonly ITelegramServices _telegramServices;
+        private readonly ITelegramRepository _telegramRepository;
 
-        public BotController(IMessageParser messageParser, IConfiguration configuration, ITelegramServices telegramServices)
+        public BotController(IMessageParser messageParser, IConfiguration configuration, ITelegramRepository telegramRepository)
         {
             //Injected dependencies
             _messageParser = messageParser;
-            _telegramServices = telegramServices;
+            _telegramRepository = telegramRepository;
             _token = configuration["BlimpBotTelegramToken"];
         }
 
@@ -35,7 +35,7 @@ namespace BlimpBot.Controllers
         [HttpGet("BasicInfo")]
         public async Task<ActionResult<string>> GetBasicInfoAsync()
         {
-            return await _telegramServices.GetBasicInfo();
+            return await _telegramRepository.GetBasicInfo();
         }
 
 
@@ -48,13 +48,14 @@ namespace BlimpBot.Controllers
                 if (telegramUpdate?.TelegramMesssage?.TelegramChat == null) return Ok();
 
                 var chat = telegramUpdate.TelegramMesssage.TelegramChat;
-                //if (telegramUpdate.TelegramMesssage.TelegramChat.Type != ChatTypes.Private)
-                //    _messageParser.AddChatListing(chat);
+                
+                if (telegramUpdate.TelegramMesssage.TelegramChat.Type != ChatTypes.Private)
+                    _messageParser.AddUpdateChatListing(chat);
 
                 var response = _messageParser.GetResponse(telegramUpdate.TelegramMesssage.Text);
 
                 if (string.IsNullOrWhiteSpace(response)) return Ok();
-                _telegramServices.SendMessage(response, chat.Id);
+                _telegramRepository.SendMessage(response, chat.Id);
             }
             catch(Exception ex)
             {

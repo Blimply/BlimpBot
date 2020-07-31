@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlimpBot.Interfaces
 {
-    public interface ITelegramServices
+    public interface ITelegramRepository
     {
         Task<ActionResult<string>> SendMessage(string message, int chatId);
         ActionResult<int> GetChatMemberCount(int chatId);

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BlimpBot.Interfaces
 {
-    public interface IWeatherServices
+    public interface IWeatherRepository
     {
         string GetWeatherString(List<string> argumentsList);
     }

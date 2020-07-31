@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BlimpBot.Data;
 using BlimpBot.Interfaces;
+using BlimpBot.Repository;
 using BlimpBot.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -45,10 +46,11 @@ namespace BlimpBot
                                         JsonNamingPolicy.CamelCase);
             services.AddRazorPages();
 
-            services.AddScoped<IWeatherServices, WeatherServices>();
+            services.AddScoped<IWeatherRepository, WeatherRepository>();
             services.AddScoped<IMessageParser, MessageParserServices>();
-            services.AddScoped<IExchangeRateServices, OpenExchangeRateServices>();
-            services.AddScoped<ITelegramServices, TelegramServices>();
+            services.AddScoped<IExchangeRateRepository, OpenExchangeRateRepository>();
+            services.AddScoped<ITelegramRepository, TelegramRepository>();
+            services.AddScoped<IChatRepository, ChatRepository>();
 
         }
 

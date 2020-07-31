@@ -6,32 +6,34 @@ using BlimpBot.Data;
 using BlimpBot.Data.Models;
 using BlimpBot.Interfaces;
 using BlimpBot.Models.TelegramResponseModels;
+using Org.BouncyCastle.Utilities.IO;
 
 namespace BlimpBot.Services
 {
     public class MessageParserServices : IMessageParser
     {
-        private readonly IWeatherServices _weatherServices;
-        private readonly IExchangeRateServices _exchangeRateServices;
-        private readonly ITelegramServices _telegramServices;
-        private readonly BlimpBotContext _context;
+        private readonly IWeatherRepository _weatherRepository;
+        private readonly IExchangeRateRepository _exchangeRateRepository;
+        private readonly ITelegramRepository _telegramRepository;
+        private readonly IChatRepository _chatRepository;
 
-        public MessageParserServices(IWeatherServices weatherServices,
-                                     IExchangeRateServices exchangeRateServices,
-                                     ITelegramServices telegramServices,
-                                     BlimpBotContext context)
+        public MessageParserServices(IWeatherRepository weatherRepository,
+                                     IExchangeRateRepository exchangeRateRepository,
+                                     ITelegramRepository telegramRepository,
+                                     IChatRepository chatRepository)
         {
-            _weatherServices = weatherServices;
-            _exchangeRateServices = exchangeRateServices;
-            _telegramServices = telegramServices;
-            _context = context;
+            _weatherRepository = weatherRepository;
+            _exchangeRateRepository = exchangeRateRepository;
+            _telegramRepository = telegramRepository;
+            _chatRepository = chatRepository;
+
         }
         public string GetResponse(string message)
         {
             var isBlimpSpecific = false;
             if (message.Contains("@"))
             {
-                if (!message.ToLower().Contains("blimbpot"))
+                if (!message.ToLower().Contains("blimpbot"))
                     return string.Empty; //message is for another bot
                 isBlimpSpecific = true;
             }
@@ -44,33 +46,12 @@ namespace BlimpBot.Services
                     response = GetCommandResponse(parsedCommand.commandName,parsedCommand.arguments, isBlimpSpecific);
                     break;
                 case MessageType.Message:
-                    response = GetMessageResponse(message);
+                    response = GetMessageResponse(message, isBlimpSpecific);
                     break;
             }
 
             //url encoding is done by query helper
             return response;
-        }
-
-        public void AddChatListing(TelegramChat telegramChat)
-        {
-            DateTime now = DateTime.Now;
-
-            Chat dbChat = _context.Chats.FirstOrDefault(i=>i.ChatId == telegramChat.Id);
-            if (dbChat != null) return;
-
-            int memberCount = _telegramServices.GetChatMemberCount(telegramChat.Id).Value;
-            
-            var chatToAdd = new Chat
-            {
-                ChatId = telegramChat.Id,
-                Name = telegramChat.Title,
-                MembersCount = memberCount,
-                LastMessageReceived = now,
-            };
-
-            _context.Chats.Add(chatToAdd);
-            _context.SaveChanges();
         }
 
         private MessageType GetMessageType(string message)
@@ -99,30 +80,66 @@ namespace BlimpBot.Services
             switch (commandName)
             {
                 case "weather":
-                    return _weatherServices.GetWeatherString(arguments);
+                    return _weatherRepository.GetWeatherString(arguments);
                 case "exchangerates":
                 case "exrates":
                 case "rates":
-                    return _exchangeRateServices.GetExchangeRateString(arguments);
+                    return _exchangeRateRepository.GetExchangeRateString(arguments);
                 default:
                     return isBlimpSpecific ? "Command unknown" : string.Empty;
             }
         }
 
-        private string GetMessageResponse(string message)
+        private string GetMessageResponse(string message, bool isBlimpSpecific)
         {
             var msg = message.ToLower();
 
             if (!msg.Contains("blimpbot")) return string.Empty;
 
-            if (msg.Contains("hi") || msg.Contains("hello"))
+            if (msg.Contains("hi ") || msg.Contains("hello "))
                 return "Hello!";
 
             if (msg.Contains("how are you") || msg.Contains("how're you"))
-                return "Feelin' fine";
+                return "Feelin' fine, thanks fam";
 
-            return string.Empty;
+            return isBlimpSpecific ? "I don't understand sorry." : string.Empty;
         }
 
+        public void AddUpdateChatListing(TelegramChat telegramChat)
+        {
+            if(_chatRepository.CheckIfChatExistsByTelegramChatId(telegramChat.Id))
+                UpdateChatListing(telegramChat);
+            else
+                AddChatListing(telegramChat);
+        }
+
+        private void AddChatListing(TelegramChat telegramChat)
+        {
+            DateTime now = DateTime.Now;
+
+            int memberCount = _telegramRepository.GetChatMemberCount(telegramChat.Id).Value;
+
+            var chatToAdd = new Chat
+            {
+                ChatId = telegramChat.Id,
+                Name = telegramChat.Title,
+                MembersCount = memberCount,
+                LastMessageReceived = now,
+            };
+
+            _chatRepository.AddChat(chatToAdd);
+            _chatRepository.SaveChanges();
+        }
+
+        public void UpdateChatListing(TelegramChat telegramChat)
+        {
+            Chat dbChat = _chatRepository.GetChatByTelegramChatId(telegramChat.Id);
+            dbChat.MembersCount = _telegramRepository.GetChatMemberCount(telegramChat.Id)
+                                                     .Value;
+
+            dbChat.LastMessageReceived = DateTime.Now;
+            _chatRepository.SaveChanges();
+
+        }
     }
 }

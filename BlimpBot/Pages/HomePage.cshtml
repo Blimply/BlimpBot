@@ -8,7 +8,7 @@
 
 <h1>Hello and welcome to BlimpBot's homepage! Hope you have a nice day.</h1>
 
-I am currently in @(Model.Chats.Count) chats. The names of these chats are:
+I am currently in @(Model.Chats.Count) chat(s). The names of these chat(s) are:
 <table>
     <tr>
         <th>Chat Name</th>
@@ -24,7 +24,7 @@ I am currently in @(Model.Chats.Count) chats. The names of these chats are:
                 @TimeZoneInfo.ConvertTimeFromUtc(chat.LastMessageReceived
                                                                .Value
                                                                .ToUniversalTime(),
-                                                           TimeZoneInfo.FindSystemTimeZoneById("W. Australia Standard Time")).ToString("yyyy-MMM-dd hh:mm:ss tt")
+                                                           TimeZoneInfo.FindSystemTimeZoneById("W. Australia Standard Time")).ToString("dd-MMM-yyyy hh:mm:ss tt")
             </td>
         </tr>
     }

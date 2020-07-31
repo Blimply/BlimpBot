@@ -136,7 +136,7 @@ namespace BlimpBot.Services
             Chat dbChat = _chatRepository.GetChatByTelegramChatId(telegramChat.Id);
             dbChat.MembersCount = _telegramRepository.GetChatMemberCount(telegramChat.Id)
                                                      .Value;
-
+            dbChat.Name = telegramChat.Title;
             dbChat.LastMessageReceived = DateTime.Now;
             _chatRepository.SaveChanges();
 

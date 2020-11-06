@@ -1,7 +1,7 @@
-﻿using BlimpBot.Data.Models;
+﻿using BlimpBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BlimpBot.Data
+namespace BlimpBot.Database
 {
     public class BlimpBotContext : DbContext
     {
@@ -10,10 +10,13 @@ namespace BlimpBot.Data
         }
 
         public DbSet<Chat> Chats { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Chat>().ToTable("Chat");
+            modelBuilder.Entity<Review>()
+                        .Property(p => p.Emoji)
+                        .IsUnicode();
         }
     }
 }

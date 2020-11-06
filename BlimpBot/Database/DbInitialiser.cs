@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using BlimpBot.Data.Models;
+using BlimpBot.Database.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BlimpBot.Data
+namespace BlimpBot.Database
 {
     public static class DbInitialiser
     {

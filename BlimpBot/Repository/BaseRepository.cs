@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BlimpBot.Data;
+using BlimpBot.Database;
 
 namespace BlimpBot.Repository
 {
@@ -13,6 +13,5 @@ namespace BlimpBot.Repository
         {
             Context.SaveChanges();
         }
-
     }
 }

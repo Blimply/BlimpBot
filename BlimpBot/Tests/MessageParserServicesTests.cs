@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using BlimpBot.Data.Models;
+using BlimpBot.Database.Models;
 using BlimpBot.Interfaces;
 using BlimpBot.Models.TelegramResponseModels;
 using BlimpBot.Services;
@@ -15,7 +15,8 @@ namespace BlimpBot.Tests
         private Mock<ITelegramRepository> telegramRepositoryMock;
         private Mock<IWeatherRepository> weatherRepositoryMock;
         private Mock<IExchangeRateRepository> exchangeRateRepositoryMock;
-        private Mock<IChatRepository> chatRepositoryMock;
+        private Mock<IChatBotRepository> chatRepositoryMock;
+        private Mock<IReviewRepository> reviewRepositoryMock;
 
         [SetUp]
         public void SetUp()
@@ -24,51 +25,54 @@ namespace BlimpBot.Tests
             telegramRepositoryMock = new Mock<ITelegramRepository>();
             weatherRepositoryMock = new Mock<IWeatherRepository>();
             exchangeRateRepositoryMock = new Mock<IExchangeRateRepository>();
-            chatRepositoryMock = new Mock<IChatRepository>();
+            chatRepositoryMock = new Mock<IChatBotRepository>();
+            reviewRepositoryMock = new Mock<IReviewRepository>();
             
             messageParserServices = new MessageParserServices(weatherRepositoryMock.Object,
                                                               exchangeRateRepositoryMock.Object,
                                                               telegramRepositoryMock.Object,
-                                                              chatRepositoryMock.Object);
+                                                              chatRepositoryMock.Object,
+                                                              reviewRepositoryMock.Object
+                                                            );
         }
 
         [Test]
         public void ShouldReturnEmptyIfMessagesIsTargetedAtAnotherBot()
         {
-            string result = messageParserServices.GetResponse("message@ADifferentBot");
+            string result = messageParserServices.GetChatResponse("message@ADifferentBot");
             Assert.AreEqual(string.Empty, result);
         }
 
         [Test]
         public void ShouldReturnNotEmptyIsMessageIsTargetedAtBlimpBot()
         {
-            string result = messageParserServices.GetResponse("message@blimpbot");
+            string result = messageParserServices.GetChatResponse("message@blimpbot");
             Assert.AreNotEqual(string.Empty, result);
-            result = messageParserServices.GetResponse("/command@blimpbot");
+            result = messageParserServices.GetChatResponse("/command@blimpbot");
             Assert.AreNotEqual(string.Empty, result);
-            result = messageParserServices.GetResponse("/command@blImpBoT");
+            result = messageParserServices.GetChatResponse("/command@blImpBoT");
             Assert.AreNotEqual(string.Empty, result);
-            result = messageParserServices.GetResponse("Hi blimpbot");
+            result = messageParserServices.GetChatResponse("Hi blimpbot");
             Assert.AreNotEqual(string.Empty, result);
-            result = messageParserServices.GetResponse("How are you blimpbot");
+            result = messageParserServices.GetChatResponse("How are you blimpbot");
             Assert.AreNotEqual(string.Empty, result);
         }
         [Test]
         public void ShouldReturnEmptyIfMessageIsGeneral()
         {
-            string result = messageParserServices.GetResponse("some random message not for blimpy");
+            string result = messageParserServices.GetChatResponse("some random message not for blimpy");
             Assert.AreEqual(string.Empty, result);
-            result = messageParserServices.GetResponse("some random message that blimpbot doesn't understand");
+            result = messageParserServices.GetChatResponse("some random message that blimpbot doesn't understand");
             Assert.AreEqual(string.Empty, result);
         }
 
         [Test]
         public void ShouldReturnWeatherResult()
         {
-            weatherRepositoryMock.Setup(w => w.GetWeatherString(It.IsAny<List<string>>())).Returns("Some response from the weather API");
-            string result = messageParserServices.GetResponse("/weather@blimpbot");
+            weatherRepositoryMock.Setup(w => w.GetChatResponse(It.IsAny<List<string>>())).Returns("Some response from the weather API");
+            string result = messageParserServices.GetChatResponse("/weather@blimpbot");
             Assert.AreNotEqual(string.Empty, result);
-            result = messageParserServices.GetResponse("/weather");
+            result = messageParserServices.GetChatResponse("/weather");
             Assert.AreNotEqual(string.Empty, result);
         }
 

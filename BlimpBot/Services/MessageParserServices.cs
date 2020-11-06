@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BlimpBot.Constants;
-using BlimpBot.Data;
-using BlimpBot.Data.Models;
+using BlimpBot.Database.Models;
 using BlimpBot.Interfaces;
 using BlimpBot.Models.TelegramResponseModels;
 using Org.BouncyCastle.Utilities.IO;
@@ -15,20 +14,23 @@ namespace BlimpBot.Services
         private readonly IWeatherRepository _weatherRepository;
         private readonly IExchangeRateRepository _exchangeRateRepository;
         private readonly ITelegramRepository _telegramRepository;
-        private readonly IChatRepository _chatRepository;
+        private readonly IChatBotRepository _chatBotRepository;
+        private readonly IReviewRepository _reviewRepository;
 
         public MessageParserServices(IWeatherRepository weatherRepository,
                                      IExchangeRateRepository exchangeRateRepository,
                                      ITelegramRepository telegramRepository,
-                                     IChatRepository chatRepository)
+                                     IChatBotRepository chatBotRepository,
+                                     IReviewRepository reviewRepository)
         {
             _weatherRepository = weatherRepository;
             _exchangeRateRepository = exchangeRateRepository;
             _telegramRepository = telegramRepository;
-            _chatRepository = chatRepository;
+            _chatBotRepository = chatBotRepository;
+            _reviewRepository = reviewRepository;
 
         }
-        public string GetResponse(string message)
+        public string GetChatResponse(string message)
         {
             var isBlimpSpecific = false;
             if (message.Contains("@"))
@@ -80,11 +82,14 @@ namespace BlimpBot.Services
             switch (commandName)
             {
                 case "weather":
-                    return _weatherRepository.GetWeatherString(arguments);
+                    return _weatherRepository.GetChatResponse(arguments);
                 case "exchangerates":
                 case "exrates":
                 case "rates":
-                    return _exchangeRateRepository.GetExchangeRateString(arguments);
+                    return _exchangeRateRepository.GetChatResponse(arguments);
+                case "review":
+                case "reviews":
+                    return _reviewRepository.GetChatResponse(arguments);
                 default:
                     return isBlimpSpecific ? "Command unknown" : string.Empty;
             }
@@ -107,7 +112,7 @@ namespace BlimpBot.Services
 
         public void AddUpdateChatListing(TelegramChat telegramChat)
         {
-            if(_chatRepository.CheckIfChatExistsByTelegramChatId(telegramChat.Id))
+            if(_chatBotRepository.CheckIfChatExistsByTelegramChatId(telegramChat.Id))
                 UpdateChatListing(telegramChat);
             else
                 AddChatListing(telegramChat);
@@ -127,18 +132,18 @@ namespace BlimpBot.Services
                 LastMessageReceived = now,
             };
 
-            _chatRepository.AddChat(chatToAdd);
-            _chatRepository.SaveChanges();
+            _chatBotRepository.AddChat(chatToAdd);
+            _chatBotRepository.SaveChanges();
         }
 
         public void UpdateChatListing(TelegramChat telegramChat)
         {
-            Chat dbChat = _chatRepository.GetChatByTelegramChatId(telegramChat.Id);
+            Chat dbChat = _chatBotRepository.GetChatByTelegramChatId(telegramChat.Id);
             dbChat.MembersCount = _telegramRepository.GetChatMemberCount(telegramChat.Id)
                                                      .Value;
             dbChat.Name = telegramChat.Title;
             dbChat.LastMessageReceived = DateTime.Now;
-            _chatRepository.SaveChanges();
+            _chatBotRepository.SaveChanges();
 
         }
     }

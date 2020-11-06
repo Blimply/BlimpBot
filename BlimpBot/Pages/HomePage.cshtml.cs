@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BlimpBot.Database;
+using BlimpBot.Database.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BlimpBot.Data;
-using BlimpBot.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

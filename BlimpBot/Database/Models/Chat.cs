@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BlimpBot.Data.Models
+namespace BlimpBot.Database.Models
 {
     public class Chat
     {

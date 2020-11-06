@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace BlimpBot.Interfaces
 {
-    public interface IBaseRepository
+    public interface IChatCommandRepository
     {
-        void SaveChanges();
+        string GetChatResponse(List<string> arguments);
     }
 }

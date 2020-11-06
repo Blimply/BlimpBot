@@ -3,14 +3,16 @@ using System;
 using BlimpBot.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BlimpBot.Migrations
 {
     [DbContext(typeof(BlimpBotContext))]
-    partial class BlimpBotContextModelSnapshot : ModelSnapshot
+    [Migration("20201106074514_ChangeEmojiToNullInt")]
+    partial class ChangeEmojiToNullInt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,10 +54,8 @@ namespace BlimpBot.Migrations
                     b.Property<DateTime>("DateUpdated")
                         .HasColumnType("datetime");
 
-                    b.Property<string>("Emoji")
-                        .HasColumnType("varchar(100)")
-                        .HasMaxLength(100)
-                        .IsUnicode(true);
+                    b.Property<int?>("Emoji")
+                        .HasColumnType("int");
 
                     b.Property<string>("LongText")
                         .IsRequired()
@@ -74,8 +74,7 @@ namespace BlimpBot.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("varchar(100)")
-                        .HasMaxLength(100);
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

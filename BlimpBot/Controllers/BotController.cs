@@ -17,6 +17,7 @@ namespace BlimpBot.Controllers
         private readonly IMessageParser _messageParser;
         private readonly ITelegramRepository _telegramRepository;
 
+
         public BotController(IMessageParser messageParser, IConfiguration configuration, ITelegramRepository telegramRepository)
         {
             //Injected dependencies
@@ -52,8 +53,7 @@ namespace BlimpBot.Controllers
                 if (telegramUpdate.TelegramMesssage.TelegramChat.Type != ChatTypes.Private)
                     _messageParser.AddUpdateChatListing(chat);
 
-                var response = _messageParser.GetResponse(telegramUpdate.TelegramMesssage.Text);
-
+                var response = _messageParser.GetChatResponse(telegramUpdate.TelegramMesssage.Text);
                 if (string.IsNullOrWhiteSpace(response)) return Ok();
                 _telegramRepository.SendMessage(response, chat.Id);
             }

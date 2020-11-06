@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using BlimpBot.Data;
+using BlimpBot.Database;
 using BlimpBot.Interfaces;
 using BlimpBot.Repository;
 using BlimpBot.Services;
@@ -15,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.AzureAppServices;
 
 namespace BlimpBot
 {
@@ -50,8 +48,15 @@ namespace BlimpBot
             services.AddScoped<IMessageParser, MessageParserServices>();
             services.AddScoped<IExchangeRateRepository, OpenExchangeRateRepository>();
             services.AddScoped<ITelegramRepository, TelegramRepository>();
-            services.AddScoped<IChatRepository, ChatRepository>();
+            services.AddScoped<IChatBotRepository, ChatBotRepository>();
+            services.AddScoped<IReviewRepository, ReviewRepository>();
 
+            services.Configure<AzureFileLoggerOptions>(options =>
+            {
+                options.FileName = "azure-diagnostics-";
+                options.FileSizeLimit = 50 * 1024;
+                options.RetainedFileCountLimit = 5;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,16 +1,16 @@
 ﻿using System.Linq;
-using BlimpBot.Data;
-using BlimpBot.Data.Models;
+using BlimpBot.Database;
+using BlimpBot.Database.Models;
 using BlimpBot.Interfaces;
 using BlimpBot.Models.TelegramResponseModels;
 
 namespace BlimpBot.Repository
 {
-    public class ChatRepository : BaseRepository, IChatRepository
+    public class ChatBotRepository : BaseRepository, IChatBotRepository
     {
         private readonly BlimpBotContext _context;
 
-        public ChatRepository(BlimpBotContext context)
+        public ChatBotRepository(BlimpBotContext context)
         {
             Context = context;
             _context = context;

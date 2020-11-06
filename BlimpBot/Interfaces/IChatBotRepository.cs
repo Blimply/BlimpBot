@@ -1,9 +1,9 @@
-﻿using BlimpBot.Data.Models;
+﻿using BlimpBot.Database.Models;
 using BlimpBot.Models.TelegramResponseModels;
 
 namespace BlimpBot.Interfaces
 {
-    public interface IChatRepository : IBaseRepository
+    public interface IChatBotRepository : IDatabaseRepository
     {
         Chat GetChatByDatabaseId(int id);
         Chat GetChatByTelegramChatId(int telegramChatId);

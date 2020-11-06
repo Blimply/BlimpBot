@@ -8,6 +8,7 @@ using BlimpBot.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace BlimpBot.Services
 {
@@ -15,16 +16,19 @@ namespace BlimpBot.Services
     {
         private readonly string _token;
         private readonly HttpClient _client;
+        private readonly ILogger<TelegramRepository> _logger;
         private readonly string _telegramBaseUri = "https://api.telegram.org/bot";
 
-        public TelegramRepository(HttpClient client, IConfiguration configuration)
+        public TelegramRepository(HttpClient client, IConfiguration configuration, ILogger<TelegramRepository> logger)
         {
             _client = client;
+            _logger = logger;
             _token = configuration["BlimpBotTelegramToken"];
         }
         public async Task<ActionResult<string>> GetBasicInfo()
         {
             var responseString = await _client.GetStringAsync(_telegramBaseUri + _token + "/getMe");
+            _logger.LogWarning($"Got basic info!");
             return responseString;
         }
         public async Task<ActionResult<string>> SendMessage(string message, int chatId)
@@ -36,7 +40,7 @@ namespace BlimpBot.Services
                 ["parse_mode"] = "HTML",
             };
             var request = QueryHelpers.AddQueryString($"{_telegramBaseUri}{_token}/sendMessage", query);
-            //Console.WriteLine(request);
+            _logger.LogWarning($"Request url {request}");
             return await _client.GetStringAsync(request);
         }
 

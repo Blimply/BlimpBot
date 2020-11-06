@@ -22,7 +22,7 @@ namespace BlimpBot.Services
             _openExchangeRateApiToken = _configuration["OpenExchangeRatesToken"];
         }
 
-        public string GetExchangeRateString(List<string> argumentsList)
+        public string GetChatResponse(List<string> argumentsList)
         {
             var response = GetExchangeRates();
             var rates = response.rates;

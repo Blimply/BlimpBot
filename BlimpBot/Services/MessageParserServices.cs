@@ -16,19 +16,21 @@ namespace BlimpBot.Services
         private readonly ITelegramRepository _telegramRepository;
         private readonly IChatBotRepository _chatBotRepository;
         private readonly IReviewRepository _reviewRepository;
+        private readonly ICryptoRepository _cryptoRepository;
 
         public MessageParserServices(IWeatherRepository weatherRepository,
                                      IExchangeRateRepository exchangeRateRepository,
                                      ITelegramRepository telegramRepository,
                                      IChatBotRepository chatBotRepository,
-                                     IReviewRepository reviewRepository)
+                                     IReviewRepository reviewRepository,
+                                     ICryptoRepository cryptoRepository)
         {
             _weatherRepository = weatherRepository;
             _exchangeRateRepository = exchangeRateRepository;
             _telegramRepository = telegramRepository;
             _chatBotRepository = chatBotRepository;
             _reviewRepository = reviewRepository;
-
+            _cryptoRepository = cryptoRepository;
         }
         public string GetChatResponse(string message)
         {
@@ -79,20 +81,33 @@ namespace BlimpBot.Services
 
         private string GetCommandResponse(string commandName, List<string> arguments, bool isBlimpSpecific)
         {
+            IChatCommandRepository repository;
+
             switch (commandName)
             {
                 case "weather":
-                    return _weatherRepository.GetChatResponse(arguments);
+                    repository = _weatherRepository;
+                    break;
                 case "exchangerates":
                 case "exrates":
                 case "rates":
-                    return _exchangeRateRepository.GetChatResponse(arguments);
+                    repository = _exchangeRateRepository;
+                    break;
+                case "cryptos":
+                case "coins":
+                case "crypto":
+                    repository = _cryptoRepository;
+                    break;
                 case "review":
                 case "reviews":
-                    return _reviewRepository.GetChatResponse(arguments);
+                    repository = _reviewRepository;
+                    break;
                 default:
                     return isBlimpSpecific ? "Command unknown" : string.Empty;
             }
+
+            if (repository != null) return repository.GetChatResponse(arguments);
+            return isBlimpSpecific ? "Command unknown" : string.Empty;
         }
 
         private string GetMessageResponse(string message, bool isBlimpSpecific)

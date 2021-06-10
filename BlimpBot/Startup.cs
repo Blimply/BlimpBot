@@ -50,6 +50,7 @@ namespace BlimpBot
             services.AddScoped<ITelegramRepository, TelegramRepository>();
             services.AddScoped<IChatBotRepository, ChatBotRepository>();
             services.AddScoped<IReviewRepository, ReviewRepository>();
+            services.AddScoped<ICryptoRepository, CryptoRepository>();
 
             services.Configure<AzureFileLoggerOptions>(options =>
             {

@@ -17,6 +17,7 @@ namespace BlimpBot.Tests
         private Mock<IExchangeRateRepository> exchangeRateRepositoryMock;
         private Mock<IChatBotRepository> chatRepositoryMock;
         private Mock<IReviewRepository> reviewRepositoryMock;
+        private Mock<ICryptoRepository> cryptoRepository;
 
         [SetUp]
         public void SetUp()
@@ -32,7 +33,8 @@ namespace BlimpBot.Tests
                                                               exchangeRateRepositoryMock.Object,
                                                               telegramRepositoryMock.Object,
                                                               chatRepositoryMock.Object,
-                                                              reviewRepositoryMock.Object
+                                                              reviewRepositoryMock.Object,
+                                                              cryptoRepository.Object
                                                             );
         }
 

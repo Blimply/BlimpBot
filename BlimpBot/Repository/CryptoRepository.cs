@@ -25,10 +25,10 @@ namespace BlimpBot.Services
         public string GetChatResponse(List<string> argumentsList)
         {
             if (argumentsList.Count == 0)
-                argumentsList = new List<string>() {"bitcoin", "dogecoin", "bananos", "fantom"};
+                argumentsList = new List<string>() {"bitcoin", "dogecoin", "banano", "fantom"};
             
             var response = GetCryptoRate(string.Join(",", argumentsList));
-            var timestamp = DateTime.Now;
+            var timestamp = DateTime.UtcNow.AddHours(8);
 
             var outString = $"Current value of cryptos in AUD as of {timestamp:dddd, dd MMMM yyyy HH:mm:ss}(AWST)\n";
             foreach ((string key, Dictionary<string, float> valueDict) in response)

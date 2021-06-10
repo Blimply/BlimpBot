@@ -13,24 +13,20 @@ namespace BlimpBot.Services
     public class CryptoRepository : ICryptoRepository
     {
         private readonly HttpClient _client;
-        private readonly string _openExchangeRateApiToken;
-        private readonly IConfiguration _configuration;
-        public CryptoRepository(HttpClient client, IConfiguration configuration)
+        public CryptoRepository(HttpClient client)
         {
             _client = client;
-            _configuration = configuration;
-            _openExchangeRateApiToken = _configuration["OpenExchangeRatesToken"];
         }
 
         public string GetChatResponse(List<string> argumentsList)
         {
             if (argumentsList.Count == 0)
-                argumentsList = new List<string>() {"bitcoin", "dogecoin", "banano", "fantom"};
+                argumentsList = new List<string>{"bitcoin", "dogecoin", "banano", "fantom"};
             
             var response = GetCryptoRate(string.Join(",", argumentsList));
             var timestamp = DateTime.UtcNow.AddHours(8);
 
-            var outString = $"Current value of cryptos in AUD as of {timestamp:dddd, dd MMMM yyyy HH:mm:ss}(AWST)\n";
+            var outString = $"Current value of cryptos in AUD as of {timestamp:dddd, dd MMMM yyyy HH:mm:ss} (AWST)\n";
             foreach ((string key, Dictionary<string, float> valueDict) in response)
             {
                 outString += $"{key}: ${valueDict["aud"]}\n";

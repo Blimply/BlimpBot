@@ -127,7 +127,7 @@ namespace BlimpBot.Services
 
         public void AddUpdateChatListing(TelegramChat telegramChat)
         {
-            if(_chatBotRepository.CheckIfChatExistsByTelegramChatId(telegramChat.Id))
+            if(_chatBotRepository.CheckIfChatExistsByTelegramChatId(telegramChat.Id.ToString()))
                 UpdateChatListing(telegramChat);
             else
                 AddChatListing(telegramChat);
@@ -141,7 +141,7 @@ namespace BlimpBot.Services
 
             var chatToAdd = new Chat
             {
-                ChatId = telegramChat.Id,
+                ChatId = telegramChat.Id.ToString(),
                 Name = telegramChat.Title,
                 MembersCount = memberCount,
                 LastMessageReceived = now,
@@ -153,7 +153,7 @@ namespace BlimpBot.Services
 
         public void UpdateChatListing(TelegramChat telegramChat)
         {
-            Chat dbChat = _chatBotRepository.GetChatByTelegramChatId(telegramChat.Id);
+            Chat dbChat = _chatBotRepository.GetChatByTelegramChatId(telegramChat.Id.ToString());
             dbChat.MembersCount = _telegramRepository.GetChatMemberCount(telegramChat.Id)
                                                      .Value;
             dbChat.Name = telegramChat.Title;

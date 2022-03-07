@@ -8,8 +8,8 @@ namespace BlimpBot.Interfaces
 {
     public interface ITelegramRepository
     {
-        Task<ActionResult<string>> SendMessage(string message, string chatId);
-        ActionResult<int> GetChatMemberCount(string chatId);
+        Task<ActionResult<string>> SendMessage(string message, long chatId);
+        ActionResult<int> GetChatMemberCount(long chatId);
         Task<ActionResult<string>> GetBasicInfo();
     }
 }

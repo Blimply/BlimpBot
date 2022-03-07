@@ -52,7 +52,7 @@ namespace BlimpBot.Repository
 
         public bool CheckIfChatExists(TelegramChat chat)
         {
-            return CheckIfChatExistsByTelegramChatId(chat.Id);
+            return CheckIfChatExistsByTelegramChatId(chat.Id.ToString());
         }
 
         public bool CheckIfChatExists(Chat chat)

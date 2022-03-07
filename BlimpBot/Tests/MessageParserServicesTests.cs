@@ -82,15 +82,15 @@ namespace BlimpBot.Tests
         public void ShouldRunAddingChatToDatabase()
         {
             chatRepositoryMock.Setup(r => r.AddChat(It.IsAny<Chat>())).Returns(true);
-            chatRepositoryMock.Setup(r=>r.CheckIfChatExistsByTelegramChatId(It.IsAny<int>())).Returns(false);
+            chatRepositoryMock.Setup(r=>r.CheckIfChatExistsByTelegramChatId(It.IsAny<string>())).Returns(false);
 
 
-            telegramRepositoryMock.Setup(r => r.GetChatMemberCount(It.IsAny<int>()))
+            telegramRepositoryMock.Setup(r => r.GetChatMemberCount(It.IsAny<string>()))
                                   .Returns(3);
 
             var testChat = new TelegramChat
             {
-                Id=329,
+                Id=329.ToString(),
                 Title = "TestChat",
             };
 
@@ -100,17 +100,17 @@ namespace BlimpBot.Tests
         [Test]
         public void ShouldRunUpdatingChatInDatabase()
         {
-            chatRepositoryMock.Setup(r => r.CheckIfChatExistsByTelegramChatId(It.IsAny<int>())).Returns(true);
+            chatRepositoryMock.Setup(r => r.CheckIfChatExistsByTelegramChatId(It.IsAny<string>())).Returns(true);
 
-            chatRepositoryMock.Setup(r => r.GetChatByTelegramChatId(It.IsAny<int>()))
+            chatRepositoryMock.Setup(r => r.GetChatByTelegramChatId(It.IsAny<string>()))
                               .Returns(new Chat());
 
-            telegramRepositoryMock.Setup(r => r.GetChatMemberCount(It.IsAny<int>()))
+            telegramRepositoryMock.Setup(r => r.GetChatMemberCount(It.IsAny<string>()))
                                   .Returns(3);
 
             var testChat = new TelegramChat
             {
-                Id = 329,
+                Id = 329.ToString(),
                 Title = "TestChat",
             };
 

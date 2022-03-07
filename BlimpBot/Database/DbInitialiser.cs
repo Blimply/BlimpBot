@@ -19,7 +19,7 @@ namespace BlimpBot.Database
             {
                 new Chat
                 {
-                    ChatId = 0,
+                    ChatId = "0",
                     MembersCount = 0,
                     Name = "Seed data",
                     LastMessageReceived = now

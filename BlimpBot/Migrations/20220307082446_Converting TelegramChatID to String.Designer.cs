@@ -3,14 +3,16 @@ using System;
 using BlimpBot.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BlimpBot.Migrations
 {
     [DbContext(typeof(BlimpBotContext))]
-    partial class BlimpBotContextModelSnapshot : ModelSnapshot
+    [Migration("20220307082446_Converting TelegramChatID to String")]
+    partial class ConvertingTelegramChatIDtoString
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

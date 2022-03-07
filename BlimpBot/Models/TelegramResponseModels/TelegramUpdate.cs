@@ -12,8 +12,11 @@ namespace BlimpBot.Models.TelegramResponseModels
         public TelegramMesssage ChannelPost { get; set; }
 
         public TelegramMesssage EditedChannelPost { get; set; }
-
-
-
     }
+
+    //public class Result
+    //{
+    //    public int update_id { get; set; }
+    //    public Message message { get; set; }
+    //}
 }

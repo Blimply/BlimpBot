@@ -31,7 +31,7 @@ namespace BlimpBot.Services
             _logger.LogWarning($"Got basic info!");
             return responseString;
         }
-        public async Task<ActionResult<string>> SendMessage(string message, int chatId)
+        public async Task<ActionResult<string>> SendMessage(string message, string chatId)
         {
             var query = new Dictionary<string, string>
             {
@@ -44,7 +44,7 @@ namespace BlimpBot.Services
             return await _client.GetStringAsync(request);
         }
 
-        public ActionResult<int> GetChatMemberCount(int chatId)
+        public ActionResult<int> GetChatMemberCount(string chatId)
         {
             var query = new Dictionary<string, string>
             {

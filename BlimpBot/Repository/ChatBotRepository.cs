@@ -21,7 +21,7 @@ namespace BlimpBot.Repository
             return _context.Chats.Find(id);
         }
 
-        public Chat GetChatByTelegramChatId(int telegramChatId)
+        public Chat GetChatByTelegramChatId(string telegramChatId)
         {
             return _context.Chats.FirstOrDefault(i => i.ChatId == telegramChatId);
         }
@@ -45,7 +45,7 @@ namespace BlimpBot.Repository
             return DeleteChat(GetChatByDatabaseId(id));
         }
 
-        public bool CheckIfChatExistsByTelegramChatId(int telegramChatId)
+        public bool CheckIfChatExistsByTelegramChatId(string telegramChatId)
         {
             return _context.Chats.FirstOrDefault(i=>i.ChatId == telegramChatId) != null;
         }

@@ -7,6 +7,7 @@ using BlimpBot.Database;
 using BlimpBot.Database.Models;
 using BlimpBot.ExtensionMethods;
 using BlimpBot.Interfaces;
+using BlimpBot.Models;
 
 namespace BlimpBot.Repository
 {
@@ -20,7 +21,7 @@ namespace BlimpBot.Repository
             _context = context;
         }
         
-        public string GetChatResponse(List<string> arguments)
+        public OurChatResponse GetChatResponse(List<string> arguments)
         {
             Review review = null;
             if(arguments.Count == 0) review = GetReview();
@@ -29,7 +30,9 @@ namespace BlimpBot.Repository
                 if (arguments[0].ToLower() == "recent") review = GetMostRecentReview();
                 else review = GetReviewByCategory(ParseCategory(arguments[0]));
             }
-            return ParseReviewIntoTelegramString(review);
+            return new OurChatResponse{
+                Text = ParseReviewIntoTelegramString(review)
+            };
         }
 
         private string ParseReviewIntoTelegramString(Review review)

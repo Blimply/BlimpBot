@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using BlimpBot.Interfaces;
+using BlimpBot.Models;
 using BlimpBot.Models.ExchangeRateModels;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
@@ -10,19 +11,19 @@ using Newtonsoft.Json;
 
 namespace BlimpBot.Services
 {
-    public class OpenExchangeRateRepository : IExchangeRateRepository
+    public class OpenExchangeRateService : IExchangeRateService
     {
         private readonly HttpClient _client;
         private readonly string _openExchangeRateApiToken;
         private readonly IConfiguration _configuration;
-        public OpenExchangeRateRepository(HttpClient client, IConfiguration configuration)
+        public OpenExchangeRateService(HttpClient client, IConfiguration configuration)
         {
             _client = client;
             _configuration = configuration;
             _openExchangeRateApiToken = _configuration["OpenExchangeRatesToken"];
         }
 
-        public string GetChatResponse(List<string> argumentsList)
+        public OurChatResponse GetChatResponse(List<string> argumentsList)
         {
             var response = GetExchangeRates();
             var rates = response.rates;
@@ -37,7 +38,7 @@ namespace BlimpBot.Services
                     outString += $"{key}: {value}\n";
             }
 
-            return outString;
+            return new OurChatResponse{Text=outString};
         }
 
         //Free tier only offers USD, so we need to convert to AUD

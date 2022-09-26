@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using BlimpBot.Interfaces;
-using BlimpBot.Models.ExchangeRateModels;
+using BlimpBot.Models;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace BlimpBot.Services
 {
-    public class CryptoRepository : ICryptoRepository
+    public class CryptoServices : ICryptoServices
     {
         private readonly HttpClient _client;
-        public CryptoRepository(HttpClient client)
+        public CryptoServices(HttpClient client)
         {
             _client = client;
         }
 
-        public string GetChatResponse(List<string> argumentsList)
+        public OurChatResponse GetChatResponse(List<string> argumentsList)
         {
             if (argumentsList.Count == 0)
                 argumentsList = new List<string>{"bitcoin", "dogecoin", "banano", "fantom"};
@@ -32,7 +30,7 @@ namespace BlimpBot.Services
                 outString += $"{key}: ${valueDict["aud"]}\n";
             }
 
-            return outString;
+            return new OurChatResponse{ Text = outString };
         }
 
         private Dictionary<string, Dictionary<string, float>> GetCryptoRate(string cryptoNames)

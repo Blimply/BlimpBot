@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using BlimpBot.Constants;
 using BlimpBot.Database.Models;
 using BlimpBot.Interfaces;
+using BlimpBot.Models;
 using BlimpBot.Models.TelegramResponseModels;
 using BlimpBot.Services;
 using Moq;
@@ -13,69 +15,93 @@ namespace BlimpBot.Tests
     {
         private MessageParserServices messageParserServices;
         private Mock<ITelegramRepository> telegramRepositoryMock;
-        private Mock<IWeatherRepository> weatherRepositoryMock;
-        private Mock<IExchangeRateRepository> exchangeRateRepositoryMock;
+        private Mock<IWeatherServices> weatherRepositoryMock;
+        private Mock<IExchangeRateService> exchangeRateServiceMock;
         private Mock<IChatBotRepository> chatRepositoryMock;
         private Mock<IReviewRepository> reviewRepositoryMock;
-        private Mock<ICryptoRepository> cryptoRepository;
+        private Mock<ICryptoServices> cryptoServicesMock;
+        private Mock<IMinorApiServices> minorApiServiceMock;
 
         [SetUp]
         public void SetUp()
         {
 
             telegramRepositoryMock = new Mock<ITelegramRepository>();
-            weatherRepositoryMock = new Mock<IWeatherRepository>();
-            exchangeRateRepositoryMock = new Mock<IExchangeRateRepository>();
+            weatherRepositoryMock = new Mock<IWeatherServices>();
+            exchangeRateServiceMock = new Mock<IExchangeRateService>();
             chatRepositoryMock = new Mock<IChatBotRepository>();
             reviewRepositoryMock = new Mock<IReviewRepository>();
+            cryptoServicesMock = new Mock<ICryptoServices>();
+            minorApiServiceMock = new Mock<IMinorApiServices>();
             
             messageParserServices = new MessageParserServices(weatherRepositoryMock.Object,
-                                                              exchangeRateRepositoryMock.Object,
+                                                              exchangeRateServiceMock.Object,
                                                               telegramRepositoryMock.Object,
                                                               chatRepositoryMock.Object,
                                                               reviewRepositoryMock.Object,
-                                                              cryptoRepository.Object
+                                                              cryptoServicesMock.Object,
+                                                              minorApiServiceMock.Object
                                                             );
         }
 
         [Test]
         public void ShouldReturnEmptyIfMessagesIsTargetedAtAnotherBot()
         {
-            string result = messageParserServices.GetChatResponse("message@ADifferentBot");
-            Assert.AreEqual(string.Empty, result);
+            OurChatResponse result = messageParserServices.GetChatResponse("message@ADifferentBot");
+            Assert.AreEqual(string.Empty, result.Text);
         }
 
         [Test]
         public void ShouldReturnNotEmptyIsMessageIsTargetedAtBlimpBot()
         {
-            string result = messageParserServices.GetChatResponse("message@blimpbot");
-            Assert.AreNotEqual(string.Empty, result);
+            OurChatResponse result = messageParserServices.GetChatResponse("message@blimpbot");
+            Assert.AreNotEqual(string.Empty, result.Text);
             result = messageParserServices.GetChatResponse("/command@blimpbot");
-            Assert.AreNotEqual(string.Empty, result);
+            Assert.AreNotEqual(string.Empty, result.Text);
             result = messageParserServices.GetChatResponse("/command@blImpBoT");
-            Assert.AreNotEqual(string.Empty, result);
+            Assert.AreNotEqual(string.Empty, result.Text);
             result = messageParserServices.GetChatResponse("Hi blimpbot");
-            Assert.AreNotEqual(string.Empty, result);
+            Assert.AreNotEqual(string.Empty, result.Text);
             result = messageParserServices.GetChatResponse("How are you blimpbot");
-            Assert.AreNotEqual(string.Empty, result);
+            Assert.AreNotEqual(string.Empty, result.Text);
         }
         [Test]
         public void ShouldReturnEmptyIfMessageIsGeneral()
         {
-            string result = messageParserServices.GetChatResponse("some random message not for blimpy");
-            Assert.AreEqual(string.Empty, result);
+            OurChatResponse result = messageParserServices.GetChatResponse("some random message not for blimpy");
+            Assert.AreEqual(string.Empty, result.Text);
             result = messageParserServices.GetChatResponse("some random message that blimpbot doesn't understand");
-            Assert.AreEqual(string.Empty, result);
+            Assert.AreEqual(string.Empty, result.Text);
         }
 
         [Test]
         public void ShouldReturnWeatherResult()
         {
-            weatherRepositoryMock.Setup(w => w.GetChatResponse(It.IsAny<List<string>>())).Returns("Some response from the weather API");
-            string result = messageParserServices.GetChatResponse("/weather@blimpbot");
-            Assert.AreNotEqual(string.Empty, result);
+            //Not sure I like having to mock the virtual method
+            weatherRepositoryMock.Setup(w => w.GetChatResponse(It.IsAny<List<string>>(), MinorApiType.None))
+                                 .Returns(new OurChatResponse{Text = "Some response from the weather API"});
+
+            OurChatResponse result = messageParserServices.GetChatResponse("/weather@blimpbot");
+            Assert.AreNotEqual(string.Empty, result.Text);
             result = messageParserServices.GetChatResponse("/weather");
-            Assert.AreNotEqual(string.Empty, result);
+            Assert.AreNotEqual(string.Empty, result.Text);
+        }
+
+        [Test]
+        public void ShouldReturnDuckResult()
+        {
+            minorApiServiceMock.Setup(d => d.GetChatResponse(It.IsAny<List<string>>(), MinorApiType.Duck))
+                               .Returns(new OurChatResponse
+                               {
+                                   PhotoUrl = "someurl.gif",
+                                   IsPhotoMessage = true,
+                               });
+            var result = messageParserServices.GetChatResponse("/duck");
+            Assert.IsTrue(result.IsPhotoMessage);
+            result = messageParserServices.GetChatResponse("/duck@BlimpBot");
+            Assert.IsTrue(result.IsPhotoMessage);
+            result = messageParserServices.GetChatResponse("/quack");
+            Assert.IsTrue(result.IsPhotoMessage);
         }
 
         [Test]

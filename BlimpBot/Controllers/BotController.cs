@@ -54,15 +54,16 @@ namespace BlimpBot.Controllers
                     _messageParser.AddUpdateChatListing(chat);
 
                 var response = _messageParser.GetChatResponse(telegramUpdate.TelegramMesssage.Text);
-                if (string.IsNullOrWhiteSpace(response)) return Ok();
-                _telegramRepository.SendMessage(response, chat.Id);
+                if (response.IsPhotoMessage)
+                    _telegramRepository.SendPhoto(response.Text, response.PhotoUrl, chat.Id);
+                else if (!string.IsNullOrWhiteSpace(response.Text))
+                    _telegramRepository.SendMessage(response.Text, chat.Id);
             }
             catch(Exception ex)
             {
                 Trace.TraceError(ex.ToString());
                 return Ok(); //stop telegram spamming our webhook if we fail
             }
-
             return Ok();
 
         }

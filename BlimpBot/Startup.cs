@@ -28,14 +28,14 @@ namespace BlimpBot
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Can't put this an app-setting since the port is non-default and may chang
+            // Can't put this an app-setting since the port is non-default and may change
             var connectionString = Environment.GetEnvironmentVariable("MYSQLCONNSTR_localdb");
-            
+
             if (connectionString == null || string.IsNullOrWhiteSpace(connectionString))
                 connectionString = Configuration.GetConnectionString("BlimpBotContext");
             else
                 connectionString = NormaliseAzureMySQLInAppConnString(connectionString);
-            
+
             services.AddDbContext<BlimpBotContext>(options => options.UseMySQL(connectionString));
             services.AddSingleton<HttpClient>();
 
@@ -44,13 +44,14 @@ namespace BlimpBot
                                         JsonNamingPolicy.CamelCase);
             services.AddRazorPages();
 
-            services.AddScoped<IWeatherRepository, WeatherRepository>();
+            services.AddScoped<IWeatherServices, WeatherServices>();
             services.AddScoped<IMessageParser, MessageParserServices>();
-            services.AddScoped<IExchangeRateRepository, OpenExchangeRateRepository>();
+            services.AddScoped<IExchangeRateService, OpenExchangeRateService>();
             services.AddScoped<ITelegramRepository, TelegramRepository>();
             services.AddScoped<IChatBotRepository, ChatBotRepository>();
             services.AddScoped<IReviewRepository, ReviewRepository>();
-            services.AddScoped<ICryptoRepository, CryptoRepository>();
+            services.AddScoped<ICryptoServices, CryptoServices>();
+            services.AddScoped<IMinorApiServices, MinorApiServices>();
 
             services.Configure<AzureFileLoggerOptions>(options =>
             {

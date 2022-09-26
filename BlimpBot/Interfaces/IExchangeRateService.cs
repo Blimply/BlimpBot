@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BlimpBot.Interfaces
 {
-    public interface ICryptoRepository : IChatCommandRepository
+    public interface IExchangeRateService : IChatCommandRepository
     {
     }
 }

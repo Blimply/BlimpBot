@@ -40,7 +40,35 @@ namespace BlimpBot.Services
                 ["parse_mode"] = "HTML",
             };
             var request = QueryHelpers.AddQueryString($"{_telegramBaseUri}{_token}/sendMessage", query);
-            _logger.LogWarning($"Request url {request}");
+            _logger.LogWarning("Request url {Request}", request);
+            return await _client.GetStringAsync(request);
+        }
+
+        public async Task<ActionResult<string>>SendPhoto(string caption, string photoUrl, long chatId)
+        {
+            var isAnimation = false;
+            if (photoUrl.Contains(".gif"))
+            {
+                isAnimation = true;
+            }
+            var query = new Dictionary<string, string>
+            {
+                ["chat_id"] = chatId.ToString(),
+                ["caption"] = caption,
+                ["parse_mode"] = "HTML",
+            };
+
+            string request;
+            if (isAnimation) { 
+                query.Add("animation",photoUrl);
+                request = QueryHelpers.AddQueryString($"{_telegramBaseUri}{_token}/sendAnimation", query);
+            }
+            else { 
+                query.Add("photo",photoUrl);
+                request = QueryHelpers.AddQueryString($"{_telegramBaseUri}{_token}/sendPhoto", query);
+            }
+            
+            _logger.LogWarning("Request url {Request}", request);
             return await _client.GetStringAsync(request);
         }
 

@@ -4,45 +4,48 @@ using System.Linq;
 using BlimpBot.Constants;
 using BlimpBot.Database.Models;
 using BlimpBot.Interfaces;
+using BlimpBot.Models;
 using BlimpBot.Models.TelegramResponseModels;
-using Org.BouncyCastle.Utilities.IO;
 
 namespace BlimpBot.Services
 {
     public class MessageParserServices : IMessageParser
     {
-        private readonly IWeatherRepository _weatherRepository;
-        private readonly IExchangeRateRepository _exchangeRateRepository;
+        private readonly IWeatherServices _weatherServices;
+        private readonly IExchangeRateService _exchangeRateService;
         private readonly ITelegramRepository _telegramRepository;
         private readonly IChatBotRepository _chatBotRepository;
         private readonly IReviewRepository _reviewRepository;
-        private readonly ICryptoRepository _cryptoRepository;
+        private readonly ICryptoServices _cryptoServices;
+        private readonly IMinorApiServices _minorApiServices;
 
-        public MessageParserServices(IWeatherRepository weatherRepository,
-                                     IExchangeRateRepository exchangeRateRepository,
+        public MessageParserServices(IWeatherServices weatherServices,
+                                     IExchangeRateService exchangeRateService,
                                      ITelegramRepository telegramRepository,
                                      IChatBotRepository chatBotRepository,
                                      IReviewRepository reviewRepository,
-                                     ICryptoRepository cryptoRepository)
+                                     ICryptoServices cryptoServices,
+                                     IMinorApiServices minorApiServices)
         {
-            _weatherRepository = weatherRepository;
-            _exchangeRateRepository = exchangeRateRepository;
+            _weatherServices = weatherServices;
+            _exchangeRateService = exchangeRateService;
             _telegramRepository = telegramRepository;
             _chatBotRepository = chatBotRepository;
             _reviewRepository = reviewRepository;
-            _cryptoRepository = cryptoRepository;
+            _cryptoServices = cryptoServices;
+            _minorApiServices = minorApiServices;
         }
-        public string GetChatResponse(string message)
+        public OurChatResponse GetChatResponse(string message)
         {
             var isBlimpSpecific = false;
             if (message.Contains("@"))
             {
                 if (!message.ToLower().Contains("blimpbot"))
-                    return string.Empty; //message is for another bot
+                    return new OurChatResponse(); //message is for another bot
                 isBlimpSpecific = true;
             }
 
-            var response = string.Empty;
+            OurChatResponse response = new OurChatResponse();
             switch (GetMessageType(message))
             {
                 case MessageType.Command:
@@ -79,50 +82,69 @@ namespace BlimpBot.Services
             
         }
 
-        private string GetCommandResponse(string commandName, List<string> arguments, bool isBlimpSpecific)
+        private OurChatResponse GetCommandResponse(string commandName, List<string> arguments, bool isBlimpSpecific)
         {
-            IChatCommandRepository repository;
+            IChatCommandRepository repository = null;
 
+            var apiType = MinorApiType.None;
             switch (commandName)
             {
                 case "weather":
-                    repository = _weatherRepository;
+                    repository = _weatherServices;
                     break;
                 case "exchangerates":
                 case "exrates":
                 case "rates":
-                    repository = _exchangeRateRepository;
+                    repository = _exchangeRateService;
                     break;
                 case "cryptos":
                 case "coins":
                 case "crypto":
-                    repository = _cryptoRepository;
+                    repository = _cryptoServices;
                     break;
                 case "review":
                 case "reviews":
                     repository = _reviewRepository;
                     break;
-                default:
-                    return isBlimpSpecific ? "Command unknown" : string.Empty;
+                case "woof":
+                case "dog":
+                    apiType = MinorApiType.Dog;
+                    repository = _minorApiServices;
+                    break;
+                case "duck":
+                case "quack":
+                    apiType = MinorApiType.Duck;
+                    repository = _minorApiServices;
+                    break;
+                case "cat":
+                case "meow":
+                    apiType = MinorApiType.Cat;
+                    repository = _minorApiServices;
+                    break;
+                case "coffee":
+                    apiType = MinorApiType.Coffee;
+                    repository = _minorApiServices;
+                    break;
             }
 
-            if (repository != null) return repository.GetChatResponse(arguments);
-            return isBlimpSpecific ? "Command unknown" : string.Empty;
+            if (repository != null)
+                return repository.GetChatResponse(arguments, apiType);
+            return isBlimpSpecific ? new OurChatResponse{Text="Command unknown"} : new OurChatResponse();
         }
 
-        private string GetMessageResponse(string message, bool isBlimpSpecific)
+        private OurChatResponse GetMessageResponse(string message, bool isBlimpSpecific)
         {
             var msg = message.ToLower();
 
-            if (!msg.Contains("blimpbot")) return string.Empty;
+            if (!msg.Contains("blimpbot")) return new OurChatResponse();
 
             if (msg.Contains("hi ") || msg.Contains("hello "))
-                return "Hello!";
+                return new OurChatResponse{Text="Hello!"};
 
             if (msg.Contains("how are you") || msg.Contains("how're you"))
-                return "Feelin' fine, thanks fam";
+                return new OurChatResponse{Text="Feelin' fine, thanks fam"};
 
-            return isBlimpSpecific ? "I don't understand sorry." : string.Empty;
+            return isBlimpSpecific ? new OurChatResponse{Text="I don't understand sorry."} : new OurChatResponse();
         }
 
         public void AddUpdateChatListing(TelegramChat telegramChat)

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BlimpBot.Interfaces
 {
-    public interface IWeatherRepository : IChatCommandRepository
+    public interface IWeatherServices : IChatCommandRepository
     {
     }
 }
